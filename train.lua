@@ -42,7 +42,7 @@ opt = {
    continue_train=0,            -- if continue training, load the latest model: 1: true, 0: false
    serial_batches = 0,          -- if 1, takes images in order to make batches, otherwise takes them randomly
    serial_batch_iter = 1,       -- iter into serial image list
-   checkpoints_dir = './checkpoints', -- models are saved here
+   checkpoints_dir = '/data2/yusheng/pix2pix_model/checkpoints', -- models are saved here
    cudnn = 1,                         -- set to 0 to not use cudnn
    condition_GAN = 1,                 -- set to 0 to use unconditional discriminator
    use_GAN = 1,                       -- set to 0 to turn off GAN term
@@ -139,10 +139,29 @@ end
 
 -- load saved models and finetune
 if opt.continue_train == 1 then
-   print('loading previously trained netG...')
-   netG = util.load(paths.concat(opt.checkpoints_dir, opt.name, 'latest_net_G.t7'), opt)
-   print('loading previously trained netD...')
-   netD = util.load(paths.concat(opt.checkpoints_dir, opt.name, 'latest_net_D.t7'), opt)
+   last_model_name = paths.concat(opt.checkpoints_dir, opt.name, 'latest_net_G.t7') 
+   if io.open(last_model_name,"r") ~= nil then -- check if a file exists
+       print('loading previously trained netG...')
+       netG = util.load(paths.concat(opt.checkpoints_dir, opt.name, 'latest_net_G.t7'), opt)
+       print('loading previously trained netD...')
+       netD = util.load(paths.concat(opt.checkpoints_dir, opt.name, 'latest_net_D.t7'), opt)       
+   else
+       model_list = util.scandir( paths.concat(opt.checkpoints_dir, opt.name), 't7' ) 
+       print (model_list) 
+       last_epoch = 0 
+       for _,model_name in pairs(model_list) do 
+          local epoch = util.split_str( model_name, '_' )
+          epoch = tonumber(epoch[1])
+          if epoch > last_epoch then 
+              last_epoch = epoch
+          end
+       end 
+            
+       print('loading previously trained netG...')
+       netG = util.load(paths.concat(opt.checkpoints_dir, opt.name, tostring(last_epoch) .. '_net_G.t7'), opt)
+       print('loading previously trained netD...')
+       netD = util.load(paths.concat(opt.checkpoints_dir, opt.name, tostring(last_epoch) .. '_net_D.t7'), opt) 
+    end
 else
   print('define model netG...')
   netG = defineG(input_nc, output_nc, ngf)

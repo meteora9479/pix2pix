@@ -40,11 +40,15 @@ for sp in splits:
         path_B = os.path.join(img_fold_B, name_B)
         if os.path.isfile(path_A) and os.path.isfile(path_B):
             name_AB = name_A
+	    fileName_ext = name_AB.split('.')[1]
+	    if fileName_ext == 'tiff':
+		name_AB = name_AB.split('.')[0]+'.png'
+
             if args.use_AB:
                 name_AB = name_AB.replace('_A.', '.') # remove _A
             path_AB = os.path.join(img_fold_AB, name_AB)
             im_A = cv2.imread(path_A, cv2.IMREAD_COLOR)
             im_B = cv2.imread(path_B, cv2.IMREAD_COLOR)
             im_AB = np.concatenate([im_A, im_B], 1)
-            cv2.imwrite(path_AB, im_AB)
+            cv2.imwrite(path_AB, im_AB )
 

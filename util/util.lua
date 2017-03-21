@@ -226,4 +226,38 @@ function util.containsValue(table, value)
   return false
 end
 
+
+-- YuSheng's extentions
+function util.split_str(inputstr, sep)
+    if sep == nil then
+            sep = "%s"
+    end
+    local t={} ; i=1
+    for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+            t[i] = str
+            i = i + 1
+    end
+    return t
+end
+
+function util.scandir(directory, filename_ext)
+    local i, t, popen = 0, {}, io.popen
+    local pfile = popen('ls -a "'..directory..'"')
+    for filename in pfile:lines() do
+        i = i + 1
+        if filename ~= nil then
+            cur_f_ext = util.split_str( filename, '.' )
+            cur_f_ext = cur_f_ext[#cur_f_ext]
+        end
+            
+        if filename_ext == '' or filename_ext == cur_f_ext then
+            t[i] = filename
+        end
+    end
+    pfile:close()
+    return t
+end
+
+
+
 return util

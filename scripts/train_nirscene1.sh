@@ -1,0 +1,1 @@
+DATA_ROOT=/data2/public-dataset/nirscene1 name=ir_image_generation which_direction=BtoA gpu=1 cudnn=1 batchSize=10 save_epoch_freq=5 th train.lua
